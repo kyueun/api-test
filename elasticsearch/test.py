@@ -125,7 +125,30 @@ class ESTest(unittest.TestCase):
             assert(test_res[i]['_source']==test2_res[i]['_source'])
 
     def test_termvector(self):
-        assert()
+        body = {
+            'fields': ['title', 'content', 'nickname'],
+            'offsets': True,
+            'payloads': True,
+            'positions': True,
+            'term_statistics': True,
+            'field_statistics': True
+        }
+
+        res = http.request(
+            'GET',
+            'http://localhost:9200/test/_termvectors/rbRf83gBsgz403FW56qg',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps(body).encode('utf-8')
+        )
+
+        res = json.loads(res.data.decode('utf-8'))
+
+        assert(body['fields'].sort()==list(res['term_vectors'].keys()).sort())
+
+        for key in res['term_vectors']:
+            assert(list(res['term_vectors'][key].keys())==['field_statistics', 'terms'])
+
+        assert('문의' in res['term_vectors']['title']['terms'].keys())
 
     def test_multitermvector(self):
         assert()
