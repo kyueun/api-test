@@ -36,10 +36,38 @@ class ESTest(unittest.TestCase):
             assert(doc['_source']['title'].find(search))
     
     def test_template(self):
-        assert()
+        template = {
+            'script': {
+                'lang': 'mustache',
+                'source': {
+                    'query': {
+                        'match': {
+                            'title': '{{query_string}}'
+                        }
+                    }
+                }
+            }
+        }
 
-    def test_search_template(self):
-        assert()
+        http.request(
+            'POST',
+            'http://localhost:9200/_scripts/unittest_template_1',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps(template).encode('utf-8')
+        )
+
+        res = http.request(
+            'GET',
+            'http://localhost:9200/_scripts/unittest_template_1'
+        )
+
+        res = json.loads(res.data.decode('utf-8'))
+        assert(res['_id']=='unittest_template_1')
+        assert(res['found'])
+        assert(json.dumps(res['script']['source']).replace('\\', '').strip('\"')==json.dumps(template['script']['source']).replace(' ', ''))
+
+    # def test_search_template(self):
+    #     assert()
 
     # def test_multisearch(self):
     #     assert()
