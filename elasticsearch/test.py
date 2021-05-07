@@ -209,14 +209,12 @@ class ESTest(unittest.TestCase):
 
         res = json.loads(res.data.decode('utf-8'))
         
-        ems = set()
         for article in res['hits']['hits']:
             assert('highlight' in article.keys())
 
             bs = BeautifulSoup('\n'.join(article['highlight']['title']), 'html.parser')
             for em in bs.find_all('div'):
                 assert(em.string=='문의')
-                ems.add(em.string)
 
     def test_suggest(self):
         suggest = {
