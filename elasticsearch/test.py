@@ -1,4 +1,5 @@
 import unittest, urllib3, json
+from bs4 import BeautifulSoup
 
 
 http = urllib3.PoolManager()
@@ -187,6 +188,33 @@ class ESTest(unittest.TestCase):
 
         assert('문의' in test_res['term_vectors']['title']['terms'].keys())
         assert('문의' in test2_res['term_vectors']['title']['terms'].keys())
+
+    def test_highlight(self):
+        highlight = {
+            'highlight': {
+                'fields': {
+                    'title': {}
+                }
+            }
+        }
+
+        res = http.request(
+            'GET',
+            'http://localhost:9200/test/_search?q=문의',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps(highlight).encode('utf-8')
+        )
+
+        res = json.loads(res.data.decode('utf-8'))
+        
+        ems = set()
+        for article in res['hits']['hits']:
+            assert('highlight' in article.keys())
+
+            bs = BeautifulSoup('\n'.join(article['highlight']['title']), 'html.parser')
+            for em in bs.find_all('em'):
+                assert(em.string=='문의')
+                ems.add(em.string)
 
 
 if __name__=='__main__':
