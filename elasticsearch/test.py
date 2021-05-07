@@ -218,6 +218,34 @@ class ESTest(unittest.TestCase):
                 assert(em.string=='문의')
                 ems.add(em.string)
 
+    def test_suggest(self):
+        suggest = {
+            'suggest': {
+                'job-suggest': {
+                    'prefix': 'eng',
+                    'completion': {
+                        'field': 'suggest'
+                    }
+                }
+            }
+        }
+
+        res = http.request(
+            'POST',
+            'http://localhost:9200/test3/_search',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps(suggest).encode('utf-8')
+        )
+
+        res = json.loads(res.data.decode('utf-8'))
+
+        assert('suggest' in res.keys())
+        assert(suggest['suggest'].keys()==res['suggest'].keys())
+        for job in res['suggest']['job-suggest']:
+            for opt in job['options']:
+                assert(sug['input'].find('eng') for sug in opt['_source']['suggest'])
+
+
 
 if __name__=='__main__':
     unittest.main()
