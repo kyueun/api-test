@@ -87,16 +87,32 @@ class ESTest(unittest.TestCase):
             assert(doc['_source']['title'].find(search))
 
     def test_multisearch(self):
-        assert()
+        body = '{ }\n{"query" : {"match" : { "title": "문의"}}}\n{"index": "test2"}\n{"query" : {"match" : { "title": "문의"}}}\n'
 
-    def test_multisearch_template(self):
-        assert()
+        res = http.request(
+            'GET',
+            'http://localhost:9200/test/_msearch',
+            headers={'Content-Type': 'application/json'},
+            body=body.encode('utf-8')
+        )
+        
+        res = json.loads(res.data.decode('utf-8'))['responses']
+        test_res = res[0]['hits']['hits']
+        test2_res = res[1]['hits']['hits']
 
-    def test_termvector(self):
-        assert()
+        assert(len(test_res)==len(test2_res))
 
-    def test_multitermvector(self):
-        assert()
+        for i in range(len(test_res)):
+            assert(test_res[i]['_source']==test2_res[i]['_source'])
+
+    # def test_multisearch_template(self):
+    #     assert()
+
+    # def test_termvector(self):
+    #     assert()
+
+    # def test_multitermvector(self):
+    #     assert()
 
 
 if __name__=='__main__':
