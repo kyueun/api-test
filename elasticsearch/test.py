@@ -151,7 +151,42 @@ class ESTest(unittest.TestCase):
         assert('문의' in res['term_vectors']['title']['terms'].keys())
 
     def test_multitermvector(self):
-        assert()
+        body = {
+            'docs': [
+                {
+                    '_index': 'test',
+                    '_id': 'rbRf83gBsgz403FW56qg',
+                    'fields': ['title', 'content']
+                },
+                {
+                    '_index': 'test2',
+                    '_id': 'OXshRXkBV5UQOOWQDwZ7',
+                    'fields': ['title', 'content']
+                }
+            ]
+        }
+
+        res = http.request(
+            'GET',
+            'http://localhost:9200/_mtermvectors',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps(body).encode('utf-8')
+        )
+
+        res = json.loads(res.data.decode('utf-8'))
+        test_res = res['docs'][0]
+        test2_res = res['docs'][1]
+
+        assert(body['docs'][0]['fields'].sort()==list(test_res['term_vectors'].keys()).sort())
+        assert(body['docs'][1]['fields'].sort()==list(test2_res['term_vectors'].keys()).sort())
+
+        for key in test_res['term_vectors']:
+            assert(list(test_res['term_vectors'][key].keys())==['field_statistics', 'terms'])
+        for key in test2_res['term_vectors']:
+            assert(list(test2_res['term_vectors'][key].keys())==['field_statistics', 'terms'])
+
+        assert('문의' in test_res['term_vectors']['title']['terms'].keys())
+        assert('문의' in test2_res['term_vectors']['title']['terms'].keys())
 
 
 if __name__=='__main__':
