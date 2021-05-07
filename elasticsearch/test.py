@@ -16,7 +16,24 @@ class ESTest(unittest.TestCase):
             assert(doc['_source']['title'].find(search))
 
     def test_dsl_search(self):
-        assert()
+        search = '문의'
+        dsl = {
+            'query': {
+                'term': {
+                    'title': search
+                }
+            }
+        }
+
+        res = http.request(
+            'GET',
+            'http://localhost:9200/test/_search',
+            headers={'Content-Type': 'application/json'},
+            body=json.dumps(dsl).encode('utf-8')
+        )
+
+        for doc in json.loads(res.data.decode('utf-8'))['hits']['hits']:
+            assert(doc['_source']['title'].find(search))
     
     def test_template(self):
         assert()
