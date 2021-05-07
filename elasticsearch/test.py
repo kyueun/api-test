@@ -105,14 +105,30 @@ class ESTest(unittest.TestCase):
         for i in range(len(test_res)):
             assert(test_res[i]['_source']==test2_res[i]['_source'])
 
-    # def test_multisearch_template(self):
-    #     assert()
+    def test_multisearch_template(self):
+        body = '{"index": "test"}\n{"id": "unittest_template_1", "params": {"query_string": "문의"}}\n{"index": "test2"}\n{"id": "unittest_template_1", "params": {"query_string": "문의"}}\n'
 
-    # def test_termvector(self):
-    #     assert()
+        res = http.request(
+            'GET',
+            'http://localhost:9200/_msearch/template',
+            headers={'Content-Type': 'application/json'},
+            body=body.encode('utf-8')
+        )
 
-    # def test_multitermvector(self):
-    #     assert()
+        res = json.loads(res.data.decode('utf-8'))['responses']
+        test_res = res[0]['hits']['hits']
+        test2_res = res[1]['hits']['hits']
+
+        assert(len(test_res)==len(test2_res))
+
+        for i in range(len(test_res)):
+            assert(test_res[i]['_source']==test2_res[i]['_source'])
+
+    def test_termvector(self):
+        assert()
+
+    def test_multitermvector(self):
+        assert()
 
 
 if __name__=='__main__':
