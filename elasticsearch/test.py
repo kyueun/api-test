@@ -192,6 +192,8 @@ class ESTest(unittest.TestCase):
     def test_highlight(self):
         highlight = {
             'highlight': {
+                'pre_tags': '<div>',
+                'post_tags': '</div>',
                 'fields': {
                     'title': {}
                 }
@@ -212,7 +214,7 @@ class ESTest(unittest.TestCase):
             assert('highlight' in article.keys())
 
             bs = BeautifulSoup('\n'.join(article['highlight']['title']), 'html.parser')
-            for em in bs.find_all('em'):
+            for em in bs.find_all('div'):
                 assert(em.string=='문의')
                 ems.add(em.string)
 
